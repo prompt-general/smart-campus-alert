@@ -8,10 +8,11 @@
     "deploy": "serverless deploy"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.525.0",
-    "@aws-sdk/client-eventbridge": "^3.525.0",
-    "@aws-sdk/client-sns": "^3.525.0",
-    "@aws-sdk/lib-dynamodb": "^3.525.0",
+    "@aws-sdk/client-cloudwatch": "^3.1037.0",
+    "@aws-sdk/client-dynamodb": "^3.1037.0",
+    "@aws-sdk/client-eventbridge": "^3.1037.0",
+    "@aws-sdk/client-sns": "^3.1037.0",
+    "@aws-sdk/lib-dynamodb": "^3.1037.0",
     "axios": "^1.15.2",
     "uuid": "^9.0.1"
   },
