@@ -52,6 +52,11 @@ provider:
           Action:
             - sqs:SendMessage
           Resource: !GetAtt EventDLQ.Arn
+        - Effect: Allow
+          Action:
+            - cloudwatch:PutMetricData
+          Resource: '*'
+
 
 
 functions:

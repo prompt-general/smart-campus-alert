@@ -1,6 +1,7 @@
 const { PutEventsCommand } = require('@aws-sdk/client-eventbridge');
+const { PutMetricDataCommand } = require('@aws-sdk/client-cloudwatch');
 const { v4: uuidv4 } = require('uuid');
-const { eventBridgeClient: eventBridge } = require('../utils/aws-clients');
+const { eventBridgeClient: eventBridge, cloudWatchClient: cloudwatch } = require('../utils/aws-clients');
 
 
 exports.handler = async (event) => {
@@ -41,6 +42,22 @@ exports.handler = async (event) => {
         };
 
         await eventBridge.send(new PutEventsCommand(params));
+
+        // Add custom metric to track alert creation
+        try {
+            await cloudwatch.send(new PutMetricDataCommand({
+                Namespace: 'CampusAlertSystem',
+                MetricData: [{
+                    MetricName: 'AlertsCreated',
+                    Value: 1,
+                    Unit: 'Count',
+                    Timestamp: new Date()
+                }]
+            }));
+        } catch (cwError) {
+            console.warn('Failed to emit CloudWatch metric (expected in local dev):', cwError.message);
+        }
+
 
         return {
             statusCode: 202,

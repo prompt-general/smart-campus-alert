@@ -2,6 +2,8 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient } = require('@aws-sdk/lib-dynamodb');
 const { EventBridgeClient } = require('@aws-sdk/client-eventbridge');
 const { SNSClient } = require('@aws-sdk/client-sns');
+const { CloudWatchClient } = require('@aws-sdk/client-cloudwatch');
+
 
 const isOffline = process.env.IS_OFFLINE === 'true';
 
@@ -32,14 +34,29 @@ const snsConfig = isOffline ? {
   }
 } : {};
 
+const cloudWatchConfig = isOffline ? {
+  region: 'us-east-1',
+  // CloudWatch is typically not mocked by serverless-offline, 
+  // but we provide a dummy config to avoid errors.
+  credentials: {
+    accessKeyId: 'MockAccessKeyId',
+    secretAccessKey: 'MockSecretAccessKey'
+  }
+} : {};
+
+
 
 const dynamoClient = new DynamoDBClient(dynamoConfig);
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const eventBridgeClient = new EventBridgeClient(eventBridgeConfig);
 const snsClient = new SNSClient(snsConfig);
+const cloudWatchClient = new CloudWatchClient(cloudWatchConfig);
+
 
 module.exports = {
   docClient,
   eventBridgeClient,
-  snsClient
+  snsClient,
+  cloudWatchClient
 };
+
