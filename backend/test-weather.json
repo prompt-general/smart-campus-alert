@@ -1,0 +1,6 @@
+{
+  "type": "WEATHER",
+  "message": "Storm warning",
+  "location": "London",
+  "createdBy": "weather-service"
+}
