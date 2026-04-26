@@ -1,0 +1,140 @@
+service: smart-campus-alert
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: dev
+  environment:
+    ALERTS_TABLE: ${self:service}-alerts-${sls:stage}
+    USERS_TABLE: ${self:service}-users-${sls:stage}
+    EVENT_BUS_NAME: CampusEventBus-${sls:stage}
+    EMERGENCY_TOPIC_ARN: !Ref EmergencyTopic
+    FACILITY_TOPIC_ARN: !Ref FacilityTopic
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - events:PutEvents
+          Resource: !GetAtt CampusEventBus.Arn
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:Query
+          Resource:
+            - !GetAtt AlertsTable.Arn
+            - !GetAtt UsersTable.Arn
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource:
+            - !Ref EmergencyTopic
+            - !Ref FacilityTopic
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+
+functions:
+  createAlert:
+    handler: functions/createAlert.handler
+    events:
+      - http:
+          path: alerts
+          method: post
+          cors: true
+    environment:
+      EVENT_BUS_NAME: ${self:provider.environment.EVENT_BUS_NAME}
+
+  processAlert:
+    handler: functions/processAlert.handler
+    events:
+      - eventBridge:
+          eventBus: !Ref CampusEventBus
+          pattern:
+            source:
+              - campus.alert
+            detail-type:
+              - AlertCreated
+
+  notifyUsers:
+    handler: functions/notifyUsers.handler
+    events:
+      - eventBridge:
+          eventBus: !Ref CampusEventBus
+          pattern:
+            source:
+              - campus.alert
+            detail-type:
+              - AlertCreated
+
+  persistAlert:
+    handler: functions/persistAlert.handler
+    events:
+      - eventBridge:
+          eventBus: !Ref CampusEventBus
+          pattern:
+            source:
+              - campus.alert
+            detail-type:
+              - AlertCreated
+    environment:
+      ALERTS_TABLE: ${self:provider.environment.ALERTS_TABLE}
+
+  getAlerts:
+    handler: functions/getAlerts.handler
+    events:
+      - http:
+          path: alerts
+          method: get
+          cors: true
+    environment:
+      ALERTS_TABLE: ${self:provider.environment.ALERTS_TABLE}
+
+resources:
+  Resources:
+    CampusEventBus:
+      Type: AWS::Events::EventBus
+      Properties:
+        Name: ${self:provider.environment.EVENT_BUS_NAME}
+
+    AlertsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.ALERTS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: alertId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: alertId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    EmergencyTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: campus-emergency-${sls:stage}
+
+    FacilityTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: campus-facility-${sls:stage}
