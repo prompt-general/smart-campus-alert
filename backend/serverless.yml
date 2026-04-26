@@ -92,7 +92,10 @@ functions:
       EVENT_BUS_NAME: ${self:provider.environment.EVENT_BUS_NAME}
 
     destinations:
-      onFailure: !GetAtt EventDLQ.Arn
+      onFailure:
+        arn: !GetAtt EventDLQ.Arn
+        type: sqs
+
 
 
   notifyUsers:
@@ -106,7 +109,10 @@ functions:
             detail-type:
               - AlertCreated
     destinations:
-      onFailure: !GetAtt EventDLQ.Arn
+      onFailure:
+        arn: !GetAtt EventDLQ.Arn
+        type: sqs
+
 
 
   persistAlert:
@@ -120,7 +126,10 @@ functions:
             detail-type:
               - AlertCreated
     destinations:
-      onFailure: !GetAtt EventDLQ.Arn
+      onFailure:
+        arn: !GetAtt EventDLQ.Arn
+        type: sqs
+
 
     environment:
       ALERTS_TABLE: ${self:provider.environment.ALERTS_TABLE}
