@@ -1,0 +1,12 @@
+{
+    "source": "campus.alert",
+    "detail-type": "AlertCreated",
+    "detail": {
+        "alertId": "abc-123",
+        "type": "EMERGENCY",
+        "message": "Fire alarm in Building A",
+        "location": "Building A",
+        "createdBy": "admin1",
+        "createdAt": "2025-04-01T12:00:00Z"
+    }
+}
