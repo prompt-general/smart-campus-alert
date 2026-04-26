@@ -6,7 +6,19 @@ const { eventBridgeClient: eventBridge, cloudWatchClient: cloudwatch } = require
 
 exports.handler = async (event) => {
     try {
+        const providedKey = event.headers['x-api-key'] || event.headers['X-Api-Key'];
+        const expectedKey = process.env.API_KEY;
+
+        if (!providedKey || providedKey !== expectedKey) {
+            return {
+                statusCode: 401,
+                headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ error: 'Unauthorized: Invalid or missing API Key' })
+            };
+        }
+
         const { type, message, location, createdBy } = JSON.parse(event.body);
+
 
         // Basic validation
         if (!type || !message || !createdBy) {

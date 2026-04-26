@@ -87,6 +87,10 @@ functions:
               - campus.alert
             detail-type:
               - AlertCreated
+    environment:
+      WEATHER_API_URL: ${self:provider.environment.WEATHER_API_URL}
+      EVENT_BUS_NAME: ${self:provider.environment.EVENT_BUS_NAME}
+
     destinations:
       onFailure: !GetAtt EventDLQ.Arn
 
@@ -130,6 +134,17 @@ functions:
           cors: true
     environment:
       ALERTS_TABLE: ${self:provider.environment.ALERTS_TABLE}
+      API_KEY: ${self:provider.environment.API_KEY}
+
+  scheduledWeatherAlert:
+    handler: functions/scheduledWeatherAlert.handler
+    events:
+      - schedule: cron(0 8 * * ? *)   # 8 AM UTC daily
+    environment:
+      EVENT_BUS_NAME: ${self:provider.environment.EVENT_BUS_NAME}
+      WEATHER_API_URL: ${self:provider.environment.WEATHER_API_URL}
+      LOCATION: "Campus"
+
 
 custom:
   serverless-offline:
