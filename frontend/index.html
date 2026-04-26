@@ -336,8 +336,10 @@
         if (!res.ok) throw new Error('Failed to send alert');
         return res.json();
       },
-      async getAlerts() {
-        const res = await fetch(`${API_BASE}/alerts`, {
+      async getAlerts(location = '') {
+        let url = `${API_BASE}/alerts`;
+        if (location) url += `?location=${encodeURIComponent(location)}`;
+        const res = await fetch(url, {
           headers: {
             'x-api-key': typeof API_KEY !== 'undefined' ? API_KEY : ''
           }
@@ -346,6 +348,7 @@
         return res.json();
       }
     };
+
 
 
     function getSeverityClass(type) {
@@ -358,17 +361,18 @@
     }
 
     async function loadAlerts() {
-      const locationFilter = document.getElementById('filterLocation').value.toLowerCase();
+      const locationFilter = document.getElementById('filterLocation').value;
       const typeFilter = document.getElementById('filterType').value;
       const listElement = document.getElementById('alertList');
 
       try {
-        const alerts = await api.getAlerts();
+        const alerts = await api.getAlerts(locationFilter);
         const filtered = alerts.filter(alert => {
-          const matchesLocation = locationFilter === '' || (alert.location && alert.location.toLowerCase().includes(locationFilter));
+          // Since location is filtered on server, we only need to filter type here
           const matchesType = typeFilter === '' || alert.type === typeFilter;
-          return matchesLocation && matchesType;
+          return matchesType;
         });
+
 
         if (filtered.length === 0) {
           listElement.innerHTML = '<div class="loading">No active alerts found.</div>';
