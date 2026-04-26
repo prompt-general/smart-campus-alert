@@ -1,0 +1,6 @@
+{
+  "type": "EMERGENCY",
+  "message": "Test fire drill",
+  "location": "Building B",
+  "createdBy": "admin1"
+}
