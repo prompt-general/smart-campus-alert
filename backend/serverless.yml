@@ -48,6 +48,11 @@ provider:
             - logs:CreateLogStream
             - logs:PutLogEvents
           Resource: '*'
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource: !GetAtt EventDLQ.Arn
+
 
 functions:
   createAlert:
@@ -70,6 +75,9 @@ functions:
               - campus.alert
             detail-type:
               - AlertCreated
+    destinations:
+      onFailure: !GetAtt EventDLQ.Arn
+
 
   notifyUsers:
     handler: functions/notifyUsers.handler
@@ -81,6 +89,9 @@ functions:
               - campus.alert
             detail-type:
               - AlertCreated
+    destinations:
+      onFailure: !GetAtt EventDLQ.Arn
+
 
   persistAlert:
     handler: functions/persistAlert.handler
@@ -92,6 +103,9 @@ functions:
               - campus.alert
             detail-type:
               - AlertCreated
+    destinations:
+      onFailure: !GetAtt EventDLQ.Arn
+
     environment:
       ALERTS_TABLE: ${self:provider.environment.ALERTS_TABLE}
 
@@ -170,3 +184,9 @@ resources:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: campus-facility-${sls:stage}
+
+    EventDLQ:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: campus-event-dlq-${sls:stage}
+        MessageRetentionPeriod: 1209600  # 14 days
