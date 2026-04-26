@@ -20,6 +20,11 @@ provider:
     EVENT_BUS_NAME: CampusEventBus-${sls:stage}
     EMERGENCY_TOPIC_ARN: !Ref EmergencyTopic
     FACILITY_TOPIC_ARN: !Ref FacilityTopic
+    # API Key for simple auth (shared secret)
+    API_KEY: ${opt:apiKey, 'default-change-me-in-production'}
+    # Weather API endpoint
+    WEATHER_API_URL: "https://wttr.in"
+
   iam:
     role:
       statements:
@@ -69,6 +74,8 @@ functions:
           cors: true
     environment:
       EVENT_BUS_NAME: ${self:provider.environment.EVENT_BUS_NAME}
+      API_KEY: ${self:provider.environment.API_KEY}
+
 
   processAlert:
     handler: functions/processAlert.handler
