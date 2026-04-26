@@ -1,0 +1,21 @@
+{
+  "name": "smart-campus-alert-backend",
+  "version": "1.0.0",
+  "description": "Serverless backend for campus alert system",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "deploy": "serverless deploy"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.525.0",
+    "@aws-sdk/client-eventbridge": "^3.525.0",
+    "@aws-sdk/client-sns": "^3.525.0",
+    "@aws-sdk/lib-dynamodb": "^3.525.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "serverless-offline": "^13.3.3"
+  }
+}
