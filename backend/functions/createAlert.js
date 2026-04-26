@@ -1,7 +1,7 @@
-const { EventBridgeClient, PutEventsCommand } = require('@aws-sdk/client-eventbridge');
+const { PutEventsCommand } = require('@aws-sdk/client-eventbridge');
 const { v4: uuidv4 } = require('uuid');
+const { eventBridgeClient: eventBridge } = require('../utils/aws-clients');
 
-const eventBridge = new EventBridgeClient({});
 
 exports.handler = async (event) => {
     try {

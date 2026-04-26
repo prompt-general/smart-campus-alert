@@ -1,8 +1,6 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand } = require('@aws-sdk/lib-dynamodb');
+const { docClient } = require('../utils/aws-clients');
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
 
 // Helper to compute severity from alert type
 function getSeverity(type) {

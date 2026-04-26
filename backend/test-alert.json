@@ -1,0 +1,6 @@
+{
+  "type": "EMERGENCY",
+  "message": "Test alert",
+  "location": "Library",
+  "createdBy": "student1"
+}

@@ -2,6 +2,13 @@ service: smart-campus-alert
 
 frameworkVersion: '3'
 
+plugins:
+  - serverless-dynamodb
+  - serverless-offline-aws-eventbridge
+  - serverless-offline-sns
+  - serverless-offline
+
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -97,6 +104,31 @@ functions:
           cors: true
     environment:
       ALERTS_TABLE: ${self:provider.environment.ALERTS_TABLE}
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    noPrependStageInUrl: true
+    lambdaPort: 3002
+  
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+  
+  serverless-offline-aws-eventbridge:
+    port: 4010
+    debug: true
+    account: "123456789012"
+  
+  serverless-offline-sns:
+    port: 4002
+    debug: true
+
 
 resources:
   Resources:

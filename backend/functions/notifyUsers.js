@@ -1,6 +1,6 @@
-const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
+const { PublishCommand } = require('@aws-sdk/client-sns');
+const { snsClient: sns } = require('../utils/aws-clients');
 
-const sns = new SNSClient({});
 
 // Mock user database (in real implementation, query DynamoDB Users table)
 // For Phase 1, we use static mocked users based on role.

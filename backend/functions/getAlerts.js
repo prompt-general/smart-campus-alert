@@ -1,8 +1,6 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { docClient } = require('../utils/aws-clients');
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
 
 exports.handler = async () => {
     try {
