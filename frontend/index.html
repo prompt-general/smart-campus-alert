@@ -327,18 +327,26 @@
       async createAlert(data) {
         const res = await fetch(`${API_BASE}/alerts`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-api-key': typeof API_KEY !== 'undefined' ? API_KEY : ''
+          },
           body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error('Failed to send alert');
         return res.json();
       },
       async getAlerts() {
-        const res = await fetch(`${API_BASE}/alerts`);
+        const res = await fetch(`${API_BASE}/alerts`, {
+          headers: {
+            'x-api-key': typeof API_KEY !== 'undefined' ? API_KEY : ''
+          }
+        });
         if (!res.ok) throw new Error('Failed to fetch alerts');
         return res.json();
       }
     };
+
 
     function getSeverityClass(type) {
       switch(type) {
